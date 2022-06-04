@@ -19,6 +19,8 @@ namespace MvvmGen.Model
         public string PropertyName { get; }
 
         public MethodInfo? CanExecuteMethod { get; set; }
+
+        public bool IsSafeCommand { get; set; } = false;
     }
 
     internal struct MethodInfo
@@ -33,5 +35,6 @@ namespace MvvmGen.Model
         public bool IsAwaitable { get; set; }
 
         public bool HasParameter { get; set; }
+        public string ParameterType { get; set; }
     }
 }

@@ -18,7 +18,13 @@ namespace MvvmGen.Generators
                 foreach (var commandToGenerate in commandsToGenerate)
                 {
                     vmBuilder.AppendLineBeforeMember();
-                    vmBuilder.AppendLine($"public DelegateCommand {commandToGenerate.PropertyName} {{ get; private set; }}");
+                    var commandType = (commandToGenerate) switch {
+                        { ExecuteMethod.IsAwaitable: true, ExecuteMethod.HasParameter: true } => $"IAsyncRelayCommand<{commandToGenerate.ExecuteMethod.ParameterType}>",
+                        { ExecuteMethod.IsAwaitable: true, ExecuteMethod.HasParameter: false } => "IAsyncRelayCommand",
+                        { ExecuteMethod.IsAwaitable: false, ExecuteMethod.HasParameter: true } => $"IRelayCommand<{commandToGenerate.ExecuteMethod.ParameterType}>",
+                        { ExecuteMethod.IsAwaitable: false, ExecuteMethod.HasParameter: false } => "IRelayCommand",
+                    };
+                    vmBuilder.AppendLine($"public {commandType} {commandToGenerate.PropertyName} {{ get; private set; }}");
                 }
             }
         }

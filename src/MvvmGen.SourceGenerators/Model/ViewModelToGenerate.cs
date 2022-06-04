@@ -27,13 +27,13 @@ namespace MvvmGen.Model
 
         public bool GenerateConstructor { get; set; }
 
-        public IEnumerable<CommandToGenerate>? CommandsToGenerate { get; set; }
+        public ICollection<CommandToGenerate> CommandsToGenerate { get; set; } = new List<CommandToGenerate>();
 
         public IDictionary<string, List<string>>? CommandsToInvalidateByPropertyName { get; set; }
 
         public IList<PropertyToGenerate>? PropertiesToGenerate { get; set; }
 
-        public IEnumerable<InjectionToGenerate>? InjectionsToGenerate { get; set; }
+        public ICollection<InjectionToGenerate> InjectionsToGenerate { get; set; } = new List<InjectionToGenerate>();
 
         public ViewModelFactoryToGenerate? ViewModelFactoryToGenerate { get; set; }
     }

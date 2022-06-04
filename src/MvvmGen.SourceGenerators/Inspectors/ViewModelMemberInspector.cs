@@ -236,7 +236,8 @@ namespace MvvmGen.Inspectors
                         canExecuteMethodInfo = new MethodInfo(canExecuteMethodSymbol.Name)
                         {
                             HasParameter = canExecuteMethodSymbol.Parameters.Any(),
-                            IsAwaitable = canExecuteMethodSymbol.IsAsync && canExecuteMethodSymbol.ReturnType.Name == "Task"
+                            IsAwaitable = canExecuteMethodSymbol.IsAsync && canExecuteMethodSymbol.ReturnType.Name == "Task",
+                            ParameterType = canExecuteMethodSymbol.Parameters.FirstOrDefault()?.Type.ContainingType.Name ?? ""
                         };
                     }
                 }

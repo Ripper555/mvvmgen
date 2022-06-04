@@ -1,38 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Configurations>Debug;Release;MvvmGen_PureCodeGeneration</Configurations>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Configurations>Debug;Release;MvvmGen_PureCodeGeneration</Configurations>
+		<LangVersion>10.0</LangVersion>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' != 'MvvmGen_PureCodeGeneration'">
-    <AssemblyName>MvvmGen.SourceGenerators</AssemblyName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'MvvmGen_PureCodeGeneration'">
-    <AssemblyName>MvvmGen.PureCodeGeneration.SourceGenerators</AssemblyName>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' != 'MvvmGen_PureCodeGeneration'">
+		<AssemblyName>MvvmGen.SourceGenerators</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'MvvmGen_PureCodeGeneration'">
+		<AssemblyName>MvvmGen.PureCodeGeneration.SourceGenerators</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'MvvmGen_PureCodeGeneration'">
-    <EmbeddedResource Include="..\MvvmGen\Attributes\CommandAttribute.cs" Link="MvvmGenLib\Attributes\CommandAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\CommandInvalidateAttribute.cs" Link="MvvmGenLib\Attributes\CommandInvalidateAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\InjectAttribute.cs" Link="MvvmGenLib\Attributes\InjectAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\PropertyAttribute.cs" Link="MvvmGenLib\Attributes\PropertyAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\PropertyCallMethodAttribute.cs" Link="MvvmGenLib\Attributes\PropertyCallMethodAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\PropertyInvalidateAttribute.cs" Link="MvvmGenLib\Attributes\PropertyInvalidateAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\PropertyPublishEventAttribute.cs" Link="MvvmGenLib\Attributes\PropertyPublishEventAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\ViewModelAttribute.cs" Link="MvvmGenLib\Attributes\ViewModelAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Attributes\ViewModelGenerateFactoryAttribute.cs" Link="MvvmGenLib\Attributes\ViewModelGenerateFactoryAttribute.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Commands\DelegateCommand.cs" Link="MvvmGenLib\Commands\DelegateCommand.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Events\EventAggregator.cs" Link="MvvmGenLib\Events\EventAggregator.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Events\IEventAggregator.cs" Link="MvvmGenLib\Events\IEventAggregator.cs" />
-    <EmbeddedResource Include="..\MvvmGen\Events\IEventSubscriber.cs" Link="MvvmGenLib\Events\IEventSubscriber.cs" />
-    <EmbeddedResource Include="..\MvvmGen\ViewModels\IViewModelFactory.cs" Link="MvvmGenLib\ViewModels\IViewModelFactory.cs" />
-    <EmbeddedResource Include="..\MvvmGen\ViewModels\ViewModelBase.cs" Link="MvvmGenLib\ViewModels\ViewModelBase.cs" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(Configuration)' == 'MvvmGen_PureCodeGeneration'">
+		<EmbeddedResource Include="..\MvvmGen\Attributes\CommandAttribute.cs" Link="MvvmGenLib\Attributes\CommandAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\CommandInvalidateAttribute.cs" Link="MvvmGenLib\Attributes\CommandInvalidateAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\InjectAttribute.cs" Link="MvvmGenLib\Attributes\InjectAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\PropertyAttribute.cs" Link="MvvmGenLib\Attributes\PropertyAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\PropertyCallMethodAttribute.cs" Link="MvvmGenLib\Attributes\PropertyCallMethodAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\PropertyInvalidateAttribute.cs" Link="MvvmGenLib\Attributes\PropertyInvalidateAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\PropertyPublishEventAttribute.cs" Link="MvvmGenLib\Attributes\PropertyPublishEventAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\ViewModelAttribute.cs" Link="MvvmGenLib\Attributes\ViewModelAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Attributes\ViewModelGenerateFactoryAttribute.cs" Link="MvvmGenLib\Attributes\ViewModelGenerateFactoryAttribute.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Commands\DelegateCommand.cs" Link="MvvmGenLib\Commands\DelegateCommand.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Events\EventAggregator.cs" Link="MvvmGenLib\Events\EventAggregator.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Events\IEventAggregator.cs" Link="MvvmGenLib\Events\IEventAggregator.cs" />
+		<EmbeddedResource Include="..\MvvmGen\Events\IEventSubscriber.cs" Link="MvvmGenLib\Events\IEventSubscriber.cs" />
+		<EmbeddedResource Include="..\MvvmGen\ViewModels\IViewModelFactory.cs" Link="MvvmGenLib\ViewModels\IViewModelFactory.cs" />
+		<EmbeddedResource Include="..\MvvmGen\ViewModels\ViewModelBase.cs" Link="MvvmGenLib\ViewModels\ViewModelBase.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+	</ItemGroup>
 
 </Project>
