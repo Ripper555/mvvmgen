@@ -35,12 +35,12 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(Configuration)' != 'MvvmGen_PureCodeGeneration'">
-    <None Include="..\MvvmGen.SourceGenerators\bin\$(Configuration)\netstandard2.0\MvvmGen.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="..\MvvmGen.SourceGenerators\bin\$(Configuration)\net6.0\MvvmGen.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Remove="_._" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'MvvmGen_PureCodeGeneration'">
-    <None Include="..\MvvmGen.SourceGenerators\bin\$(Configuration)\netstandard2.0\MvvmGen.PureCodeGeneration.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="..\MvvmGen.SourceGenerators\bin\$(Configuration)\net6.0\MvvmGen.PureCodeGeneration.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
       <None Include="_._" Pack="true" PackagePath="lib/netstandard2.0" />
   </ItemGroup>
 

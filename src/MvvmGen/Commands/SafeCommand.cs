@@ -68,7 +68,7 @@ namespace MvvmGen.Commands
         }
 
         /// <inheritdoc/>
-        public void NotifyCanExecuteChanged()
+        public void RaiseCanExecuteChanged()
         {
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }

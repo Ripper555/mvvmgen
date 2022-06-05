@@ -260,7 +260,7 @@ public sealed class AsyncRelayCommand : IAsyncRelayCommand, ICancellationAwareCo
     bool ICancellationAwareCommand.IsCancellationSupported => this.execute is null;
 
     /// <inheritdoc/>
-    public void NotifyCanExecuteChanged()
+    public void RaiseCanExecuteChanged()
     {
         CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
