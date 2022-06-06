@@ -39,5 +39,7 @@ namespace MvvmGen
         /// Gets or sets the name of the command property.
         /// </summary>
         public string? PropertyName { get; set; }
+
+        public bool IsSafe { get; set; } = false;
     }
 }

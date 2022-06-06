@@ -53,7 +53,7 @@ namespace MvvmGen
 
                     vmBuilder.GenerateConstructor(viewModelToGenerate);
 
-                    vmBuilder.GenerateCommandInitializeMethod(viewModelToGenerate.CommandsToGenerate, viewModelToGenerate.InjectionsToGenerate);
+                    //vmBuilder.GenerateCommandInitializeMethod(viewModelToGenerate.CommandsToGenerate, viewModelToGenerate.InjectionsToGenerate);
 
                     vmBuilder.GenerateCommandProperties(viewModelToGenerate.CommandsToGenerate);
 

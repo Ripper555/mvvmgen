@@ -16,10 +16,6 @@ namespace MvvmGen.Generators
         {
             if (commandsToGenerate.Any())
             {
-                vmBuilder.AppendLineBeforeMember();
-                vmBuilder.AppendLine("private void InitializeCommands()");
-                vmBuilder.AppendLine("{");
-                vmBuilder.IncreaseIndent();
                 foreach (var commandToGenerate in commandsToGenerate.Where(x => !x.IsSafeCommand))
                 {
                     var command = commandToGenerate.ExecuteMethod switch
@@ -32,7 +28,7 @@ namespace MvvmGen.Generators
                     vmBuilder.Append($"{commandToGenerate.PropertyName} = new {command}({commandToGenerate.ExecuteMethod.Name}");
                     if (commandToGenerate.CanExecuteMethod.HasValue)
                     {
-                        vmBuilder.Append($", {GetMethodCall(commandToGenerate.CanExecuteMethod.Value)}");
+                        vmBuilder.Append($", {GetMethodCall(commandToGenerate.CanExecuteMethod.Value, commandToGenerate.ExecuteMethod.HasParameter)}");
                     }
                     vmBuilder.AppendLine(");");
                 }
@@ -41,7 +37,7 @@ namespace MvvmGen.Generators
                 if (safeCommands.Any())
                 {
                     var logger = injectionsToGenerate.First(x => x.Type.Contains("ILogger")).PropertyName;
-                    var handler = injectionsToGenerate.First(x => x.Type == "MvvmGen.IExceptionHandler").PropertyName;
+                    var handler = injectionsToGenerate.First(x => x.Type == "MvvmGen.Commands.IExceptionHandler").PropertyName;
                     foreach (var commandToGenerate in safeCommands)
                     {
                         var command = commandToGenerate.ExecuteMethod switch
@@ -51,28 +47,26 @@ namespace MvvmGen.Generators
                             { IsAwaitable: false, HasParameter: true } => $"SafeCommand<{commandToGenerate.ExecuteMethod.ParameterType}>",
                             { IsAwaitable: false, HasParameter: false } => "SafeCommand",
                         };
-                        vmBuilder.Append($"{commandToGenerate.PropertyName} = new {command}({commandToGenerate.ExecuteMethod}, {logger}, {handler}");
+                        vmBuilder.Append($"{commandToGenerate.PropertyName} = new {command}({logger}, {handler}, {commandToGenerate.ExecuteMethod.Name}");
                         if (commandToGenerate.CanExecuteMethod.HasValue)
                         {
-                            vmBuilder.Append($", {GetMethodCall(commandToGenerate.CanExecuteMethod.Value)}");
+                            vmBuilder.Append($", {GetMethodCall(commandToGenerate.CanExecuteMethod.Value, commandToGenerate.ExecuteMethod.HasParameter)}");
                         }
                         vmBuilder.AppendLine(");");
                     }
                 }
-
-                vmBuilder.DecreaseIndent();
-                vmBuilder.AppendLine("}");
             }
         }
 
-        private static object GetMethodCall(MethodInfo methodInfo)
+        private static object GetMethodCall(MethodInfo methodInfo, bool commandHasParameter)
         {
             return methodInfo switch
             {
                 { IsAwaitable: true, HasParameter: true } => $"async x => await {methodInfo.Name}(x)",
                 { IsAwaitable: true, HasParameter: false } => $"async _ => await {methodInfo.Name}()",
                 { IsAwaitable: false, HasParameter: true } => $"{methodInfo.Name}",
-                { IsAwaitable: false, HasParameter: false } => $"_ => {methodInfo.Name}()",
+                { IsAwaitable: false, HasParameter: false } when commandHasParameter => $"_ => {methodInfo.Name}()",
+                { IsAwaitable: false, HasParameter: false } => $"{methodInfo.Name}",
             };
         }
     }

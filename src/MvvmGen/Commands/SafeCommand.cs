@@ -39,7 +39,7 @@ namespace MvvmGen.Commands
         /// <param name="logger"></param>
         /// <param name="exceptionHandler"></param>
         /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> is <see langword="null"/>.</exception>
-        public SafeCommand(Action execute, ILogger logger, IExceptionHandler exceptionHandler)
+        public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler,Action execute)
         {
             ArgumentNullException.ThrowIfNull(execute);
 
@@ -56,7 +56,7 @@ namespace MvvmGen.Commands
         /// <param name="logger"></param>
         /// <param name="exceptionHandler"></param>
         /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> or <paramref name="canExecute"/> are <see langword="null"/>.</exception>
-        public SafeCommand(Action execute, Func<bool> canExecute, ILogger logger, IExceptionHandler exceptionHandler)
+        public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Action execute, Func<bool> canExecute)
         {
             ArgumentNullException.ThrowIfNull(execute);
             ArgumentNullException.ThrowIfNull(canExecute);
@@ -93,52 +93,5 @@ namespace MvvmGen.Commands
                 _exceptionHandler.Handle(e);
             }
         }
-    }
-
-    public class SafeAsyncCommand : ICommand
-    {
-        private readonly IExceptionHandler _handler;
-        private readonly ILogger? _logger;
-        private readonly Func<object?, Task> _execute;
-        private readonly Func<object?, bool>? _canExecute;
-
-        public SafeAsyncCommand(IExceptionHandler handler, ILogger? logger, Func<object?, Task> execute, Func<object?, bool>? canExecute = null)
-        {
-            _handler = handler;
-            _logger = logger;
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        /// <inheritdoc/>
-        public event EventHandler? CanExecuteChanged;
-
-        /// <summary>
-        /// Raises the <see cref="CanExecuteChanged"/> event.
-        /// </summary>
-        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-
-        /// <inheritdoc/>
-        public async Task ExecuteAsync(object? parameter)
-        {
-            try
-            {
-                await _execute(parameter);
-            }
-            catch (Exception e)
-            {
-                _logger?.LogError(e, "");
-                _handler.Handle(e);
-            }
-        }
-
-        public void Execute(object? parameter)
-        {
-            _ = ExecuteAsync(parameter);
-        }
-
-        /// <inheritdoc/>
-        public bool CanExecute(object? parameter) => _canExecute == null || _canExecute(parameter);
-
     }
 }

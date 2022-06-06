@@ -19,18 +19,17 @@ namespace MvvmGen.Generators
             {
                 Generate(vmBuilder, viewModelToGenerate.ViewModelClassSymbol.Name,
                             viewModelToGenerate.InjectionsToGenerate,
-                            viewModelToGenerate.CommandsToGenerate?.Any() == true,
+                            viewModelToGenerate.CommandsToGenerate,
                             viewModelToGenerate.IsEventSubscriber);
             }
         }
 
         private static void Generate(ViewModelBuilder vmBuilder, string viewModelClassName,
-            IEnumerable<InjectionToGenerate>? injectionsToGenerate,
-            bool hasCommands, bool isEventSubscriber)
+            ICollection<InjectionToGenerate> injectionsToGenerate,
+            ICollection<CommandToGenerate> commands, bool isEventSubscriber)
         {
             vmBuilder.AppendLineBeforeMember();
             vmBuilder.Append($"public {viewModelClassName}(");
-            injectionsToGenerate ??= Enumerable.Empty<InjectionToGenerate>();
 
             var first = true;
             string? eventAggregatorAccessForSubscription = null;
@@ -48,7 +47,17 @@ namespace MvvmGen.Generators
                     vmBuilder.Append($"MvvmGen.Events.IEventAggregator {eventAggregatorAccessForSubscription}");
                 }
             }
-
+            if (commands.Any(x => x.IsSafeCommand))
+            {
+                if (!injectionsToGenerate.Any(x => x.Type.Contains("ILogger")))
+                {
+                    injectionsToGenerate.Add(new InjectionToGenerate($"Microsoft.Extensions.Logging.ILogger<{viewModelClassName}>", "Logger"));
+                }
+                if (!injectionsToGenerate.Any(x => x.Type == "MvvmGen.Commands.IExceptionHandler"))
+                {
+                    injectionsToGenerate.Add(new InjectionToGenerate("MvvmGen.Commands.IExceptionHandler", "ExceptionHandler"));
+                }
+            }
             foreach (var injectionToGenerate in injectionsToGenerate)
             {
                 if (!first)
@@ -72,9 +81,9 @@ namespace MvvmGen.Generators
                 vmBuilder.AppendLine($"{eventAggregatorAccessForSubscription}.RegisterSubscriber(this);");
             }
 
-            if (hasCommands)
+            if (commands.Any())
             {
-                vmBuilder.AppendLine($"this.InitializeCommands();");
+                vmBuilder.GenerateCommandInitializeMethod(commands, injectionsToGenerate);
             }
 
             vmBuilder.AppendLine($"this.OnInitialize();");

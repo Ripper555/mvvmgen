@@ -193,13 +193,11 @@ namespace MvvmGen.Inspectors
         }
 
         private static void FindCommandsToGenerate(List<CommandToGenerate> commandsToGenerate,
-            Dictionary<string,
-                List<string>> propertyInvalidations,
-            IMethodSymbol methodSymbol,
+            Dictionary<string, List<string>> propertyInvalidations, IMethodSymbol methodSymbol,
             System.Collections.Immutable.ImmutableArray<ISymbol> viewModelMembers)
         {
             var methodAttributes = methodSymbol.GetAttributes();
-            var commandAttributeData = methodAttributes.FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "MvvmGen.CommandAttribute");
+            var commandAttributeData = methodAttributes.FirstOrDefault(x => x.AttributeClass?.ToDisplayString() is "MvvmGen.CommandAttribute" or "MvvmGen.SafeCommandAttribute");
 
             var invalidateAttributeDatas = methodAttributes.Where(x => x.AttributeClass?.ToDisplayString() == "MvvmGen.CommandInvalidateAttribute").ToList();
 
@@ -208,12 +206,13 @@ namespace MvvmGen.Inspectors
                 var executeMethodInfo = new MethodInfo(methodSymbol.Name)
                 {
                     HasParameter = methodSymbol.Parameters.Any(),
-                    IsAwaitable = methodSymbol.IsAsync && methodSymbol.ReturnType.Name == "Task"
+                    IsAwaitable = methodSymbol.ReturnType.Name == "Task",
+                    ParameterType = methodSymbol.Parameters.FirstOrDefault()?.ToString() ?? ""
                 };
 
                 var commandPropertyName = $"{methodSymbol.Name}Command";
                 var canExecuteMethodName = commandAttributeData.ConstructorArguments.FirstOrDefault().Value?.ToString();
-
+                var isSafe = false;
                 foreach (var arg in commandAttributeData.NamedArguments)
                 {
                     if (arg.Key == "CanExecuteMethod")
@@ -223,6 +222,10 @@ namespace MvvmGen.Inspectors
                     else if (arg.Key == "PropertyName")
                     {
                         commandPropertyName = arg.Value.Value?.ToString();
+                    }
+                    else if (arg.Key == "IsSafe")
+                    {
+                        isSafe = arg.Value.Value is true;
                     }
                 }
 
@@ -236,14 +239,13 @@ namespace MvvmGen.Inspectors
                         canExecuteMethodInfo = new MethodInfo(canExecuteMethodSymbol.Name)
                         {
                             HasParameter = canExecuteMethodSymbol.Parameters.Any(),
-                            IsAwaitable = canExecuteMethodSymbol.IsAsync && canExecuteMethodSymbol.ReturnType.Name == "Task",
-                            ParameterType = canExecuteMethodSymbol.Parameters.FirstOrDefault()?.Type.ContainingType.Name ?? ""
+                            IsAwaitable = canExecuteMethodSymbol.IsAsync && canExecuteMethodSymbol.ReturnType.Name == "Task"
                         };
                     }
                 }
 
                 commandsToGenerate.Add(
-               new CommandToGenerate(executeMethodInfo, commandPropertyName)
+               new CommandToGenerate(executeMethodInfo, commandPropertyName, isSafe)
                {
                    CanExecuteMethod = canExecuteMethodInfo
                });

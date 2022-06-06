@@ -8,10 +8,11 @@ namespace MvvmGen.Model
 {
     internal class CommandToGenerate
     {
-        public CommandToGenerate(MethodInfo executeMethod, string propertyName)
+        public CommandToGenerate(MethodInfo executeMethod, string propertyName, bool isSafe)
         {
             ExecuteMethod = executeMethod;
             PropertyName = propertyName;
+            IsSafeCommand = isSafe;
         }
 
         public MethodInfo ExecuteMethod { get; }

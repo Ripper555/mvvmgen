@@ -40,7 +40,7 @@ public sealed class SafeCommand<T> : IRelayCommand<T>
     /// you should always declare it as nullable, and to always perform checks within <paramref name="execute"/>.
     /// </remarks>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> is <see langword="null"/>.</exception>
-    public SafeCommand(Action<T?> execute, ILogger logger, IExceptionHandler exceptionHandler)
+    public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Action<T?> execute)
     {
         ArgumentNullException.ThrowIfNull(execute);
 
@@ -58,7 +58,7 @@ public sealed class SafeCommand<T> : IRelayCommand<T>
     /// <param name="exceptionHandler"></param>
     /// <remarks>See notes in <see cref="RelayCommand{T}(Action{T})"/>.</remarks>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> or <paramref name="canExecute"/> are <see langword="null"/>.</exception>
-    public SafeCommand(Action<T?> execute, Predicate<T?> canExecute, ILogger logger, IExceptionHandler exceptionHandler)
+    public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Action<T?> execute, Predicate<T?> canExecute)
     {
         ArgumentNullException.ThrowIfNull(execute);
         ArgumentNullException.ThrowIfNull(canExecute);
