@@ -39,5 +39,7 @@ namespace MvvmGen
         /// Gets or sets if a constructor is generated. Default value is true.
         /// </summary>
         public bool GenerateConstructor { get; set; } = true;
+
+        public bool HasValidation { get; set; }
     }
 }

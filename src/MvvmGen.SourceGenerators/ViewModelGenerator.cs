@@ -49,7 +49,7 @@ namespace MvvmGen
 
                     vmBuilder.GenerateNamespace(viewModelToGenerate.ViewModelClassSymbol);
 
-                    vmBuilder.GenerateClass(viewModelToGenerate.ViewModelClassSymbol, viewModelBaseSymbol);
+                    vmBuilder.GenerateClass(viewModelToGenerate.ViewModelClassSymbol, viewModelBaseSymbol, viewModelToGenerate.Validation);
 
                     vmBuilder.GenerateConstructor(viewModelToGenerate);
 
@@ -119,10 +119,13 @@ namespace MvvmGen
                         propertiesToGenerate,
                         propertyInvalidationsByGeneratedPropertyName) = ViewModelMemberInspector.Inspect(viewModelClassSymbol);
 
+                    var (generateConstructor, validation) = ViewModelAttributeInspector.Inspect(viewModelAttributeData);
+
                     var viewModelToGenerate = new ViewModelToGenerate(viewModelClassSymbol)
                     {
                         InjectionsToGenerate = ViewModelInjectAttributeInspector.Inspect(viewModelClassSymbol),
-                        GenerateConstructor = ViewModelAttributeInspector.Inspect(viewModelAttributeData),
+                        GenerateConstructor = generateConstructor,
+                        Validation = validation,
                         ViewModelFactoryToGenerate = ViewModelGenerateFactoryAttributeInspector.Inspect(viewModelClassSymbol),
                         CommandsToGenerate = commandsToGenerate,
                         PropertiesToGenerate = propertiesToGenerate,

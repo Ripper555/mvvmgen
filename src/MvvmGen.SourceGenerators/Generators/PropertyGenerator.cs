@@ -37,15 +37,12 @@ namespace MvvmGen.Generators
                 vmBuilder.AppendLine();
             }
 
-            vmBuilder.AppendLine("{");
-            vmBuilder.IncreaseIndent();
+            vmBuilder.OpenBrace();
             vmBuilder.AppendLine($"get => {p.BackingField};");
             vmBuilder.AppendLine("set");
-            vmBuilder.AppendLine("{");
-            vmBuilder.IncreaseIndent();
+            vmBuilder.OpenBrace();
             vmBuilder.AppendLine($"if ({p.BackingField} != value)");
-            vmBuilder.AppendLine("{");
-            vmBuilder.IncreaseIndent();
+            vmBuilder.OpenBrace();
             vmBuilder.AppendLine($"{p.BackingField} = value;");
             vmBuilder.AppendLine($"OnPropertyChanged(\"{p.PropertyName}\");");
             if (p.PropertiesToInvalidate is not null)
@@ -63,15 +60,13 @@ namespace MvvmGen.Generators
                     if (createPublishCondition)
                     {
                         vmBuilder.AppendLine($"if ({eventToPublish.PublishCondition})");
-                        vmBuilder.AppendLine("{");
-                        vmBuilder.IncreaseIndent();
+                        vmBuilder.OpenBrace();
                     }
                     vmBuilder.AppendLine($"{eventToPublish.EventAggregatorMemberName}.Publish(new {eventToPublish.EventType}({eventToPublish.EventConstructorArgs}));");
 
                     if (createPublishCondition)
                     {
-                        vmBuilder.DecreaseIndent();
-                        vmBuilder.AppendLine("}");
+                        vmBuilder.CloseBrace();
                     }
                 }
             }
@@ -82,12 +77,9 @@ namespace MvvmGen.Generators
                     vmBuilder.AppendLine($"{methodToCall.MethodName}({methodToCall.MethodArgs});");
                 }
             }
-            vmBuilder.DecreaseIndent();
-            vmBuilder.AppendLine("}");
-            vmBuilder.DecreaseIndent();
-            vmBuilder.AppendLine("}");
-            vmBuilder.DecreaseIndent();
-            vmBuilder.AppendLine("}");
+            vmBuilder.CloseBrace();
+            vmBuilder.CloseBrace();
+            vmBuilder.CloseBrace();
         }
     }
 }

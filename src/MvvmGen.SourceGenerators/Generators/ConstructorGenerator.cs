@@ -69,8 +69,7 @@ namespace MvvmGen.Generators
             }
 
             vmBuilder.AppendLine(")");
-            vmBuilder.AppendLine("{");
-            vmBuilder.IncreaseIndent();
+            vmBuilder.OpenBrace();
             foreach (var injectionToGenerate in injectionsToGenerate)
             {
                 vmBuilder.AppendLine($"this.{injectionToGenerate.PropertyName} = {injectionToGenerate.PropertyName.ToCamelCase()};");
@@ -87,11 +86,9 @@ namespace MvvmGen.Generators
             }
 
             vmBuilder.AppendLine($"this.OnInitialize();");
-            vmBuilder.DecreaseIndent();
-            vmBuilder.AppendLine("}");
+            vmBuilder.CloseBrace();
             vmBuilder.AppendLine();
             vmBuilder.AppendLine($"partial void OnInitialize();");
-
 
         }
     }

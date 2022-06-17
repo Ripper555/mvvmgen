@@ -83,6 +83,18 @@ namespace MvvmGen
             _stringBuilder.Append(stringToAppend);
         }
 
+        public void OpenBrace()
+        {
+            AppendLine("{");
+            IncreaseIndent();
+        }
+
+        public void CloseBrace()
+        {
+            DecreaseIndent();
+            AppendLine("}");
+        }
+
         public override string ToString() => _stringBuilder.ToString();
     }
 }

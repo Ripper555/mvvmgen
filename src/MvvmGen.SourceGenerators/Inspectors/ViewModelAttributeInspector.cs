@@ -8,9 +8,10 @@ namespace MvvmGen.Inspectors
 {
     internal static class ViewModelAttributeInspector
     {
-        internal static bool Inspect(Microsoft.CodeAnalysis.AttributeData viewModelAttributeData)
+        internal static (bool, bool) Inspect(Microsoft.CodeAnalysis.AttributeData viewModelAttributeData)
         {
             var generateConstructor = true;
+            var validation = false;
 
             foreach (var arg in viewModelAttributeData.NamedArguments)
             {
@@ -18,9 +19,13 @@ namespace MvvmGen.Inspectors
                 {
                     generateConstructor = (bool?)arg.Value.Value == true;
                 }
+                if (arg.Key == "HasValidation")
+                {
+                    validation = (bool?)arg.Value.Value == true;
+                }
             }
 
-            return generateConstructor;
+            return (generateConstructor, validation);
         }
     }
 }

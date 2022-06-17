@@ -5,6 +5,7 @@
     <Configurations>Debug;Release;MvvmGen_PureCodeGeneration</Configurations>
     <RootNamespace>MvvmGen</RootNamespace>
 	  <LangVersion>10.0</LangVersion>
+	  <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>

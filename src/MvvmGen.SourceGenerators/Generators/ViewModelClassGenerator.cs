@@ -11,11 +11,11 @@ namespace MvvmGen.Generators
 {
     internal static class ClassGenerator
     {
-        internal static void GenerateClass(this ViewModelBuilder vmBuilder, INamedTypeSymbol viewModelClassSymbol, INamedTypeSymbol viewModelBaseSymbol)
+        internal static void GenerateClass(this ViewModelBuilder vmBuilder, INamedTypeSymbol viewModelClassSymbol, INamedTypeSymbol viewModelBaseSymbol, bool validation)
         {
             var inheritFromViewModelBaseClass = !InheritsFromViewModelBase(viewModelClassSymbol, viewModelBaseSymbol);
 
-            vmBuilder.AppendLine($"partial class {viewModelClassSymbol.Name}" + (inheritFromViewModelBaseClass ? " : global::MvvmGen.ViewModels.ViewModelBase" : ""));
+            vmBuilder.AppendLine($"partial class {viewModelClassSymbol.Name}" + /*(inheritFromViewModelBaseClass ?*/ GetBaseClass(validation) /*: "")*/);
             vmBuilder.AppendLine("{");
             vmBuilder.IncreaseIndent();
         }
@@ -39,5 +39,10 @@ namespace MvvmGen.Generators
 
             return inherits;
         }
+
+        private static string GetBaseClass(bool validation) =>
+            validation ? 
+                " : global::MvvmGen.ViewModels.ViewModelBaseWithValidation" 
+                : " : global::MvvmGen.ViewModels.ViewModelBase";
     }
 }

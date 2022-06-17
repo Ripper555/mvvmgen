@@ -26,6 +26,7 @@ namespace MvvmGen.Model
         public bool IsEventSubscriber { get; set; }
 
         public bool GenerateConstructor { get; set; }
+        public bool Validation { get; set; }
 
         public ICollection<CommandToGenerate> CommandsToGenerate { get; set; } = new List<CommandToGenerate>();
 

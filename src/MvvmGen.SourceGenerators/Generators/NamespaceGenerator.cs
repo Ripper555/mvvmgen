@@ -21,9 +21,8 @@ namespace MvvmGen.Generators
                 // TODO: Show an error here. ViewModel class must be top-level within a namespace
             }
 
-            vmBuilder.AppendLine($"namespace {viewModelClassSymbol.ContainingNamespace}");
-            vmBuilder.AppendLine("{");
-            vmBuilder.IncreaseIndent();
+            vmBuilder.AppendLine($"namespace {viewModelClassSymbol.ContainingNamespace};");
+            vmBuilder.AppendLine();
         }
     }
 }
