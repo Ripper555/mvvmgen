@@ -6,47 +6,46 @@
 
 using System.Collections.Generic;
 
-namespace MvvmGen.Events
+namespace MvvmGen.Events;
+
+public class TestEventSubscriber<T> : IEventSubscriber<T>
 {
-    public class TestEventSubscriber<T> : IEventSubscriber<T>
-    {
-        public List<T> ReceivedEvents { get; private set; } = new();
+    public List<T> ReceivedEvents { get; private set; } = new();
 
-        public void OnEvent(T theEvent)
-        {
-            ReceivedEvents.Add(theEvent);
-        }
+    public void OnEvent(T theEvent)
+    {
+        ReceivedEvents.Add(theEvent);
+    }
+}
+
+public class TestAllEventsSubscriberSeparateInterfaces : IEventSubscriber<CustomerDeletedEvent>, IEventSubscriber<CustomerAddedEvent>
+{
+    public CustomerDeletedEvent? ReceivedCustomerDeletedEvent { get; private set; }
+    public CustomerAddedEvent? ReceivedCustomerAddedEvent { get; private set; }
+
+    public void OnEvent(CustomerDeletedEvent theEvent)
+    {
+        ReceivedCustomerDeletedEvent = theEvent;
     }
 
-    public class TestAllEventsSubscriberSeparateInterfaces : IEventSubscriber<CustomerDeletedEvent>, IEventSubscriber<CustomerAddedEvent>
+    public void OnEvent(CustomerAddedEvent theEvent)
     {
-        public CustomerDeletedEvent? ReceivedCustomerDeletedEvent { get; private set; }
-        public CustomerAddedEvent? ReceivedCustomerAddedEvent { get; private set; }
+        ReceivedCustomerAddedEvent = theEvent;
+    }
+}
 
-        public void OnEvent(CustomerDeletedEvent theEvent)
-        {
-            ReceivedCustomerDeletedEvent = theEvent;
-        }
+public class CustomerAllEventsSubscriberSingleInterface : IEventSubscriber<CustomerDeletedEvent, CustomerAddedEvent>
+{
+    public CustomerDeletedEvent? ReceivedCustomerDeletedEvent { get; private set; }
+    public CustomerAddedEvent? ReceivedCustomerAddedEvent { get; private set; }
 
-        public void OnEvent(CustomerAddedEvent theEvent)
-        {
-            ReceivedCustomerAddedEvent = theEvent;
-        }
+    public void OnEvent(CustomerDeletedEvent theEvent)
+    {
+        ReceivedCustomerDeletedEvent = theEvent;
     }
 
-    public class CustomerAllEventsSubscriberSingleInterface : IEventSubscriber<CustomerDeletedEvent, CustomerAddedEvent>
+    public void OnEvent(CustomerAddedEvent theEvent)
     {
-        public CustomerDeletedEvent? ReceivedCustomerDeletedEvent { get; private set; }
-        public CustomerAddedEvent? ReceivedCustomerAddedEvent { get; private set; }
-
-        public void OnEvent(CustomerDeletedEvent theEvent)
-        {
-            ReceivedCustomerDeletedEvent = theEvent;
-        }
-
-        public void OnEvent(CustomerAddedEvent theEvent)
-        {
-            ReceivedCustomerAddedEvent = theEvent;
-        }
+        ReceivedCustomerAddedEvent = theEvent;
     }
 }

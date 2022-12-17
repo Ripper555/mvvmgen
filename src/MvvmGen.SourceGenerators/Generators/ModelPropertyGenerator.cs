@@ -4,17 +4,16 @@
 // Licensed under the MIT license => See LICENSE file in repository root
 // ***********************************************************************
 
-namespace MvvmGen.Generators
+namespace MvvmGen.Generators;
+
+internal static class ModelPropertyGenerator
 {
-    internal static class ModelPropertyGenerator
+    internal static void GenerateModelProperty(this ViewModelBuilder vmBuilder, string? wrappedModelType)
     {
-        internal static void GenerateModelProperty(this ViewModelBuilder vmBuilder, string? wrappedModelType)
+        if (wrappedModelType is { Length: > 0 })
         {
-            if (wrappedModelType is { Length: > 0 })
-            {
-                vmBuilder.AppendLineBeforeMember();
-                vmBuilder.AppendLine($"protected {wrappedModelType} Model {{ get; set; }}");
-            }
+            vmBuilder.AppendLineBeforeMember();
+            vmBuilder.AppendLine($"protected {wrappedModelType} Model {{ get; set; }}");
         }
     }
 }

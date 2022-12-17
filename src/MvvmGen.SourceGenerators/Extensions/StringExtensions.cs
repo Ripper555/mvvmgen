@@ -4,13 +4,12 @@
 // Licensed under the MIT license => See LICENSE file in repository root
 // ***********************************************************************
 
-namespace MvvmGen.Extensions
+namespace MvvmGen.Extensions;
+
+internal static class StringExtensions
 {
-    internal static class StringExtensions
+    internal static string ToCamelCase(this string str)
     {
-        internal static string ToCamelCase(this string str)
-        {
-            return str.Substring(0, 1).ToLower() + str.Substring(1);
-        }
+        return str.Substring(0, 1).ToLower() + str.Substring(1);
     }
 }

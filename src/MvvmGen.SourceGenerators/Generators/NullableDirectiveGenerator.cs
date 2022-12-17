@@ -4,13 +4,12 @@
 // Licensed under the MIT license => See LICENSE file in repository root
 // ***********************************************************************
 
-namespace MvvmGen.Generators
+namespace MvvmGen.Generators;
+
+internal static class NullableDirectiveGenerator
 {
-    internal static class NullableDirectiveGenerator
+    internal static void GenerateNullableDirective(this ViewModelBuilder vmBuilder)
     {
-        internal static void GenerateNullableDirective(this ViewModelBuilder vmBuilder)
-        {
-            vmBuilder.AppendLine("#nullable enable");
-        }
+        vmBuilder.AppendLine("#nullable enable");
     }
 }

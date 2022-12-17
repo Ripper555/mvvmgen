@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace MvvmGen.Commands
+namespace MvvmGen.Commands;
+
+public interface IExceptionHandler
 {
-    public interface IExceptionHandler
-    {
-        void Handle(Exception e);
-    }
+    void Handle(Exception e);
 }

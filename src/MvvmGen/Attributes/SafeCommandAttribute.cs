@@ -11,8 +11,4 @@ namespace MvvmGen;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public class SafeCommandAttribute : CommandAttribute
 {
-    public SafeCommandAttribute()
-    {
-        IsSafe = true;
-    }
 }

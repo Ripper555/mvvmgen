@@ -8,31 +8,30 @@
 
 using System;
 
-namespace MvvmGen
+namespace MvvmGen;
+
+/// <summary>
+/// Specifies that a property in the ViewModel should be generated for a field. Set this attribute on a field of a class that has the <see cref="ViewModelAttribute"/> set.
+/// </summary>
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+public class PropertyAttribute : Attribute
 {
     /// <summary>
-    /// Specifies that a property in the ViewModel should be generated for a field. Set this attribute on a field of a class that has the <see cref="ViewModelAttribute"/> set.
+    /// Initializes a new instance of the <see cref="PropertyAttribute"/> class.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class PropertyAttribute : Attribute
+    public PropertyAttribute() { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PropertyAttribute"/> class.
+    /// </summary>
+    /// <param name="propertyName">The name of the property to generate</param>
+    public PropertyAttribute(string propertyName)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyAttribute"/> class.
-        /// </summary>
-        public PropertyAttribute() { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyAttribute"/> class.
-        /// </summary>
-        /// <param name="propertyName">The name of the property to generate</param>
-        public PropertyAttribute(string propertyName)
-        {
-            PropertyName = propertyName;
-        }
-
-        /// <summary>
-        /// Gets or sets the name of property to generate.
-        /// </summary>
-        public string? PropertyName { get; set; }
+        PropertyName = propertyName;
     }
+
+    /// <summary>
+    /// Gets or sets the name of property to generate.
+    /// </summary>
+    public string? PropertyName { get; set; }
 }

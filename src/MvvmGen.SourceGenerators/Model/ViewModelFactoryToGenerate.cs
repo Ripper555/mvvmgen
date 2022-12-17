@@ -4,18 +4,17 @@
 // Licensed under the MIT license => See LICENSE file in repository root
 // ***********************************************************************
 
-namespace MvvmGen.Model
+namespace MvvmGen.Model;
+
+internal class ViewModelFactoryToGenerate
 {
-    internal class ViewModelFactoryToGenerate
+    public ViewModelFactoryToGenerate(string className, string interfaceName)
     {
-        public ViewModelFactoryToGenerate(string className, string interfaceName)
-        {
-            ClassName = className;
-            InterfaceName = interfaceName;
-        }
-
-        public string ClassName { get; }
-
-        public string InterfaceName { get; }
+        ClassName = className;
+        InterfaceName = interfaceName;
     }
+
+    public string ClassName { get; }
+
+    public string InterfaceName { get; }
 }

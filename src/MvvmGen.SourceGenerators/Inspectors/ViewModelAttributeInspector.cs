@@ -4,28 +4,27 @@
 // Licensed under the MIT license => See LICENSE file in repository root
 // ***********************************************************************
 
-namespace MvvmGen.Inspectors
+namespace MvvmGen.Inspectors;
+
+internal static class ViewModelAttributeInspector
 {
-    internal static class ViewModelAttributeInspector
+    internal static (bool, bool) Inspect(Microsoft.CodeAnalysis.AttributeData viewModelAttributeData)
     {
-        internal static (bool, bool) Inspect(Microsoft.CodeAnalysis.AttributeData viewModelAttributeData)
+        var generateConstructor = true;
+        var validation = false;
+
+        foreach (var arg in viewModelAttributeData.NamedArguments)
         {
-            var generateConstructor = true;
-            var validation = false;
-
-            foreach (var arg in viewModelAttributeData.NamedArguments)
+            if (arg.Key == "GenerateConstructor")
             {
-                if (arg.Key == "GenerateConstructor")
-                {
-                    generateConstructor = (bool?)arg.Value.Value == true;
-                }
-                if (arg.Key == "HasValidation")
-                {
-                    validation = (bool?)arg.Value.Value == true;
-                }
+                generateConstructor = (bool?)arg.Value.Value == true;
             }
-
-            return (generateConstructor, validation);
+            if (arg.Key == "HasValidation")
+            {
+                validation = (bool?)arg.Value.Value == true;
+            }
         }
+
+        return (generateConstructor, validation);
     }
 }

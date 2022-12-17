@@ -6,95 +6,94 @@
 
 using System.Text;
 
-namespace MvvmGen
+namespace MvvmGen;
+
+/// <summary>
+/// Wraps a StringBuilder and manages indention
+/// </summary>
+internal class ViewModelBuilder
 {
-    /// <summary>
-    /// Wraps a StringBuilder and manages indention
-    /// </summary>
-    internal class ViewModelBuilder
+    private string _indent = "";
+    private const int _indentSpaces = 4;
+    private int _indentLevel;
+    private bool _wasLastCallAppendLine = true;
+    private bool _isFirstMember = true;
+    private readonly StringBuilder _stringBuilder;
+
+    public ViewModelBuilder()
     {
-        private string _indent = "";
-        private const int _indentSpaces = 4;
-        private int _indentLevel;
-        private bool _wasLastCallAppendLine = true;
-        private bool _isFirstMember = true;
-        private readonly StringBuilder _stringBuilder;
+        _stringBuilder = new StringBuilder();
+    }
 
-        public ViewModelBuilder()
+    public int IndentLevel => _indentLevel;
+
+    public void IncreaseIndent()
+    {
+        _indentLevel++;
+        _indent += new string(' ', _indentSpaces);
+    }
+
+    public bool DecreaseIndent()
+    {
+        if (_indent.Length >= _indentSpaces)
         {
-            _stringBuilder = new StringBuilder();
+            _indentLevel--;
+            _indent = _indent.Substring(_indentSpaces);
+            return true;
         }
 
-        public int IndentLevel => _indentLevel;
+        return false;
+    }
 
-        public void IncreaseIndent()
-        {
-            _indentLevel++;
-            _indent += new string(' ', _indentSpaces);
-        }
-
-        public bool DecreaseIndent()
-        {
-            if (_indent.Length >= _indentSpaces)
-            {
-                _indentLevel--;
-                _indent = _indent.Substring(_indentSpaces);
-                return true;
-            }
-
-            return false;
-        }
-
-        public void AppendLineBeforeMember()
-        {
-            if (!_isFirstMember)
-            {
-                _stringBuilder.AppendLine();
-            }
-
-            _isFirstMember = false;
-        }
-
-        public void AppendLine(string line)
-        {
-            if (_wasLastCallAppendLine) // If last call was only Append, you shouldn't add the indent
-            {
-                _stringBuilder.Append(_indent);
-            }
-
-            _stringBuilder.AppendLine($"{line}");
-            _wasLastCallAppendLine = true;
-        }
-
-        public void AppendLine()
+    public void AppendLineBeforeMember()
+    {
+        if (!_isFirstMember)
         {
             _stringBuilder.AppendLine();
-            _wasLastCallAppendLine = true;
         }
 
-        public void Append(string stringToAppend)
-        {
-            if (_wasLastCallAppendLine)
-            {
-                _stringBuilder.Append(_indent);
-                _wasLastCallAppendLine = false;
-            }
-
-            _stringBuilder.Append(stringToAppend);
-        }
-
-        public void OpenBrace()
-        {
-            AppendLine("{");
-            IncreaseIndent();
-        }
-
-        public void CloseBrace()
-        {
-            DecreaseIndent();
-            AppendLine("}");
-        }
-
-        public override string ToString() => _stringBuilder.ToString();
+        _isFirstMember = false;
     }
+
+    public void AppendLine(string line)
+    {
+        if (_wasLastCallAppendLine) // If last call was only Append, you shouldn't add the indent
+        {
+            _stringBuilder.Append(_indent);
+        }
+
+        _stringBuilder.AppendLine($"{line}");
+        _wasLastCallAppendLine = true;
+    }
+
+    public void AppendLine()
+    {
+        _stringBuilder.AppendLine();
+        _wasLastCallAppendLine = true;
+    }
+
+    public void Append(string stringToAppend)
+    {
+        if (_wasLastCallAppendLine)
+        {
+            _stringBuilder.Append(_indent);
+            _wasLastCallAppendLine = false;
+        }
+
+        _stringBuilder.Append(stringToAppend);
+    }
+
+    public void OpenBrace()
+    {
+        AppendLine("{");
+        IncreaseIndent();
+    }
+
+    public void CloseBrace()
+    {
+        DecreaseIndent();
+        AppendLine("}");
+    }
+
+    public override string ToString() => _stringBuilder.ToString();
 }

@@ -8,37 +8,36 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using MvvmGen.Model;
 
-namespace MvvmGen.Inspectors
+namespace MvvmGen.Inspectors;
+
+internal static class ViewModelGenerateFactoryAttributeInspector
 {
-    internal static class ViewModelGenerateFactoryAttributeInspector
+    internal static ViewModelFactoryToGenerate? Inspect(INamedTypeSymbol viewModelClassSymbol)
     {
-        internal static ViewModelFactoryToGenerate? Inspect(INamedTypeSymbol viewModelClassSymbol)
+        ViewModelFactoryToGenerate? viewModelFactoryToGenerate = null;
+        var viewModelFactoryAttribute = viewModelClassSymbol.GetAttributes()
+            .FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "MvvmGen.ViewModelGenerateFactoryAttribute");
+
+        if (viewModelFactoryAttribute is not null)
         {
-            ViewModelFactoryToGenerate? viewModelFactoryToGenerate = null;
-            var viewModelFactoryAttribute = viewModelClassSymbol.GetAttributes()
-                .FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "MvvmGen.ViewModelGenerateFactoryAttribute");
+            var className = $"{viewModelClassSymbol.Name}Factory";
+            var interfaceName = $"I{className}";
 
-            if (viewModelFactoryAttribute is not null)
+            foreach (var arg in viewModelFactoryAttribute.NamedArguments)
             {
-                var className = $"{viewModelClassSymbol.Name}Factory";
-                var interfaceName = $"I{className}";
-
-                foreach (var arg in viewModelFactoryAttribute.NamedArguments)
+                if (arg.Key == "ClassName")
                 {
-                    if (arg.Key == "ClassName")
-                    {
-                        className = arg.Value.Value?.ToString() ?? className;
-                    }
-                    else if (arg.Key == "InterfaceName")
-                    {
-                        interfaceName = arg.Value.Value?.ToString() ?? interfaceName;
-                    }
+                    className = arg.Value.Value?.ToString() ?? className;
                 }
-
-                viewModelFactoryToGenerate = new ViewModelFactoryToGenerate(className, interfaceName);
+                else if (arg.Key == "InterfaceName")
+                {
+                    interfaceName = arg.Value.Value?.ToString() ?? interfaceName;
+                }
             }
 
-            return viewModelFactoryToGenerate;
+            viewModelFactoryToGenerate = new ViewModelFactoryToGenerate(className, interfaceName);
         }
+
+        return viewModelFactoryToGenerate;
     }
 }

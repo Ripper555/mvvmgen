@@ -10,100 +10,94 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace MvvmGen.SourceGenerators
+namespace MvvmGen.SourceGenerators;
+
+public class ViewModelGeneratorTestsBase
 {
-    public class ViewModelGeneratorTestsBase
+    private readonly static PortableExecutableReference[] _metadataReferences;
+
+    static ViewModelGeneratorTestsBase()
     {
-        private static readonly PortableExecutableReference[] _metadataReferences;
+        // Ensure MvvmGen is loaded
+        System.Reflection.Assembly.Load("MvvmGen");
 
-        static ViewModelGeneratorTestsBase()
+        _metadataReferences = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic)
+            .Select(a => MetadataReference.CreateFromFile(a.Location))
+            .ToArray();
+    }
+
+    protected static void ShouldGenerateExpectedCode(string inputCode, params string[] expectedGeneratedCode)
+    {
+        var inputCompilation = CreateCompilation(inputCode, _metadataReferences);
+
+        ViewModelGenerator generator = new();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+
+        driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+
+        var runResult = driver.GetRunResult();
+
+        //Assert.Equal(expectedGeneratedCode.Length, runResult.GeneratedTrees.Length);
+        //Assert.True(runResult.Diagnostics.IsEmpty);
+
+        var generatorResult = runResult.Results[0];
+        //Assert.Equal(generator, generatorResult.Generator);
+        //Assert.True(generatorResult.Diagnostics.IsEmpty);
+        //Assert.Equal(expectedGeneratedCode.Length, generatorResult.GeneratedSources.Length);
+        //Assert.Null(generatorResult.Exception);
+
+        foreach (var expectedCode in expectedGeneratedCode)
         {
-#if !MVVMGEN_PURECODEGENERATION
-            // Ensure MvvmGen is loaded
-            System.Reflection.Assembly.Load("MvvmGen");
-#endif
+            var found = generatorResult.GeneratedSources.Any(x => x.SourceText.ToString() == expectedCode);
 
-            _metadataReferences = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .Select(a => MetadataReference.CreateFromFile(a.Location))
-                .ToArray();
-        }
-
-        protected static void ShouldGenerateExpectedCode(string inputCode, params string[] expectedGeneratedCode)
-        {
-            var inputCompilation = CreateCompilation(inputCode, _metadataReferences);
-
-#if MVVMGEN_PURECODEGENERATION
-            ViewModelAndLibraryGenerator generator = new();
-#else
-            ViewModelGenerator generator = new();
-#endif
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-
-            driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
-
-            var runResult = driver.GetRunResult();
-
-            //Assert.Equal(expectedGeneratedCode.Length, runResult.GeneratedTrees.Length);
-            //Assert.True(runResult.Diagnostics.IsEmpty);
-
-            var generatorResult = runResult.Results[0];
-            //Assert.Equal(generator, generatorResult.Generator);
-            //Assert.True(generatorResult.Diagnostics.IsEmpty);
-            //Assert.Equal(expectedGeneratedCode.Length, generatorResult.GeneratedSources.Length);
-            //Assert.Null(generatorResult.Exception);
-
-            foreach (var expectedCode in expectedGeneratedCode)
+            if (!found)
             {
-                var found = generatorResult.GeneratedSources.Any(x => x.SourceText.ToString() == expectedCode);
-
-                if (!found)
+                Console.WriteLine($"Expected code not found: {expectedCode}");
+                Console.WriteLine("Generated sources:");
+                foreach (var generatedSourceResult in generatorResult.GeneratedSources)
                 {
-                    Console.WriteLine($"Expected code not found: {expectedCode}");
-                    Console.WriteLine("Generated sources:");
-                    foreach (var generatedSourceResult in generatorResult.GeneratedSources)
-                    {
-                        Console.WriteLine(generatedSourceResult.SourceText.ToString());
-                    }
+                    Console.WriteLine(generatedSourceResult.SourceText.ToString());
                 }
-
-                Assert.True(found, "Expected code must be in generated sources");
             }
+
+            Assert.True(found, "Expected code must be in generated sources");
         }
+    }
 
-        protected static Compilation CreateCompilation(string source, MetadataReference[] metadataReferences)
-                => CSharpCompilation.Create("compilation",
-                    new[] { CSharpSyntaxTree.ParseText(source) },
-                    metadataReferences,
-                    new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+    protected static Compilation CreateCompilation(string source, MetadataReference[] metadataReferences)
+        => CSharpCompilation.Create("compilation",
+            new[] { CSharpSyntaxTree.ParseText(source) },
+            metadataReferences,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
 
-        protected static string AutoGeneratedComment {
-            get {
+    protected static string AutoGeneratedComment {
+        get {
 #if MVVMGEN_PURECODEGENERATION
                 var generatorType = typeof(ViewModelAndLibraryGenerator);
 #else
-                var generatorType = typeof(ViewModelGenerator);
+            var generatorType = typeof(ViewModelGenerator);
 #endif
 
-                var comment = $@"// <auto-generated>
+            var comment = $@"// <auto-generated>
 //   This code was generated for you by
 //   ⚡ MvvmGen, a tool created by Thomas Claudius Huber (https://www.thomasclaudiushuber.com)
 //   Generator version: { generatorType.Assembly.GetName().Version?.ToString(3) }
 // </auto-generated>";
-                return comment;
-            }
+            return comment;
         }
+    }
 
-        protected static string AutoGeneratedNullableDirective => $@"
+    protected static string AutoGeneratedNullableDirective => $@"
 #nullable enable";
 
 
-        protected static string AutoGeneratedUsings => $@"
+    protected static string AutoGeneratedUsings => $@"
 using MvvmGen.Commands;
 using MvvmGen.Events;
 using MvvmGen.ViewModels;";
 
-        protected static string AutoGeneratedTopContent => AutoGeneratedComment + AutoGeneratedNullableDirective + AutoGeneratedUsings;
-    }
+    protected static string AutoGeneratedTopContent => AutoGeneratedComment + AutoGeneratedNullableDirective + AutoGeneratedUsings;
 }

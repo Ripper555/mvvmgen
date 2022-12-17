@@ -4,22 +4,20 @@
 // Licensed under the MIT license => See LICENSE file in repository root
 // ***********************************************************************
 
-namespace MvvmGen.Model
+namespace MvvmGen.Model;
+
+internal class InjectionToGenerate
 {
-    internal class InjectionToGenerate
+    public InjectionToGenerate(string type, string propertyName)
     {
-        public InjectionToGenerate(string type, string propertyName)
-        {
-            Type = type;
-            PropertyName = propertyName;
-        }
-        public string Type { get; }
-
-        public string PropertyName { get; internal set; }
-
-        public string PropertyAccessModifier { get; set; } = "protected";
-
-        public string SetterAccessModifier => PropertyAccessModifier == "private" ? "" : "private";
+        Type = type;
+        PropertyName = propertyName;
     }
-}
+    public string Type { get; }
 
+    public string PropertyName { get; internal set; }
+
+    public string PropertyAccessModifier { get; set; } = "protected";
+
+    public string SetterAccessModifier => PropertyAccessModifier == "private" ? "" : "private";
+}

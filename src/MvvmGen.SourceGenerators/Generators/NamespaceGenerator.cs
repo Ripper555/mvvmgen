@@ -6,23 +6,22 @@
 
 using Microsoft.CodeAnalysis;
 
-namespace MvvmGen.Generators
+namespace MvvmGen.Generators;
+
+internal static class NamespaceGenerator
 {
-    internal static class NamespaceGenerator
+    internal static void GenerateNamespace(this ViewModelBuilder vmBuilder, INamedTypeSymbol viewModelClassSymbol)
     {
-        internal static void GenerateNamespace(this ViewModelBuilder vmBuilder, INamedTypeSymbol viewModelClassSymbol)
+        vmBuilder.AppendLine();
+
+        // Add namespace declaration
+        if (viewModelClassSymbol.ContainingNamespace is null)
         {
-            vmBuilder.AppendLine();
-
-            // Add namespace declaration
-            if (viewModelClassSymbol.ContainingNamespace is null)
-            {
-                return;
-                // TODO: Show an error here. ViewModel class must be top-level within a namespace
-            }
-
-            vmBuilder.AppendLine($"namespace {viewModelClassSymbol.ContainingNamespace};");
-            vmBuilder.AppendLine();
+            return;
+            // TODO: Show an error here. ViewModel class must be top-level within a namespace
         }
+
+        vmBuilder.AppendLine($"namespace {viewModelClassSymbol.ContainingNamespace};");
+        vmBuilder.AppendLine();
     }
 }

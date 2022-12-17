@@ -4,8 +4,7 @@
 // Licensed under the MIT license => See LICENSE file in repository root
 // ***********************************************************************
 
-namespace MvvmGen.Events
-{
-    public record CustomerAddedEvent(int CustomerId);
-    public record CustomerDeletedEvent(int CustomerId);
-}
+namespace MvvmGen.Events;
+
+public record CustomerAddedEvent(int CustomerId);
+public record CustomerDeletedEvent(int CustomerId);
