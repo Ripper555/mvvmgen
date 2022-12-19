@@ -6,12 +6,10 @@
 
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using MvvmGen.Generators;
-using MvvmGen.Inspectors;
 using MvvmGen.Model;
+using MvvmGen.SourceGenerators.Model;
 
 namespace MvvmGen;
 
@@ -23,7 +21,7 @@ public class ViewModelGenerator : ISourceGenerator
 {
     public void Execute(GeneratorExecutionContext context)
     {
-        if (context.SyntaxContextReceiver is not SyntaxReceiver receiver)
+        if (context.SyntaxContextReceiver is not ViewModelSyntaxReceiver receiver)
         {
             return;
         }
@@ -75,74 +73,84 @@ public class ViewModelGenerator : ISourceGenerator
                 var sourceText = SourceText.From(vmBuilder.ToString(), Encoding.UTF8);
                 context.AddSource($"{viewModelToGenerate.ViewModelClassSymbol.ContainingNamespace}.{viewModelToGenerate.ViewModelClassSymbol.Name}.g.cs", sourceText);
             }
+
+            BuildViewModelRegistration(context, receiver.ViewModelsToGenerate);
+            BuildServiceRegistration(context, receiver.ViewModelsToGenerate, receiver.ServiceClasses);
         }
+    }
+
+    private static void BuildServiceRegistration(GeneratorExecutionContext context, IEnumerable<ViewModelToGenerate> vms, List<ServiceClass> services)
+    {
+        var file = $$"""
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.DependencyInjection.Extensions;
+
+            namespace MvvmGen;
+            public static class ServiceRegister
+            {
+                public static IServiceCollection AddServices(this IServiceCollection services)
+                {
+                    {{ServiceRegistionsMethodBody(vms, services)}}
+                    return services;
+                }
+            }
+            """;
+
+        var diSourceText = SourceText.From(file, Encoding.UTF8);
+        context.AddSource($"ServiceRegister.g.cs", diSourceText);
+
+    }
+
+    private static string ServiceRegistionsMethodBody(IEnumerable<ViewModelToGenerate> vms, List<ServiceClass> services)
+    {
+        var builder = new StringBuilder();
+        var injections = vms.SelectMany(x => x.InjectionsToGenerate.Select(i => i.Type)).ToArray();
+        foreach (var injection in injections.AsSpan())
+        {
+            var c = services.Count(s => s.Interfaces.Any(i => i.ToString() == injection));
+            if (c != 1)
+                continue;
+
+            var service = services.First(x => x.Interfaces.Any(i => i.ToString() == injection));
+            builder.AppendLine($"services.TryAddScoped<{injection}, {service.Service.ToDisplayString()}>();");
+        }
+        return builder.ToString();
+    }
+
+    private static void BuildViewModelRegistration(GeneratorExecutionContext context, IEnumerable<ViewModelToGenerate> viewModelToGenerate)
+    {
+        var file = $$"""
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.DependencyInjection.Extensions;
+
+            namespace MvvmGen;
+            public static class ViewModelRegister
+            {
+                public static IServiceCollection AddViewModels(this IServiceCollection services)
+                {
+                    {{VmRegistrationMethodBody(viewModelToGenerate)}}
+                    return services;
+                }
+            }
+            """;
+
+        var diSourceText = SourceText.From(file, Encoding.UTF8);
+        context.AddSource($"ViewModelRegister.g.cs", diSourceText);
+    }
+
+    private static string VmRegistrationMethodBody(IEnumerable<ViewModelToGenerate> vms)
+    {
+        var body = new StringBuilder();
+        foreach (var viewModelToGenerate in vms)
+        {
+            body.AppendLine($"services.TryAddTransient<{viewModelToGenerate.ViewModelClassSymbol.ToDisplayString()}>();");
+        }
+
+        return body.ToString();
     }
 
     public void Initialize(GeneratorInitializationContext context)
     {
-        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
-    }
-}
-
-/// <summary>
-/// Receives all the classes that have the MvvmGen.ViewModelAttribute set.
-/// </summary>
-internal class SyntaxReceiver : ISyntaxContextReceiver
-{
-    public List<ViewModelToGenerate> ViewModelsToGenerate { get; } = new();
-
-    /// <summary>
-    /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
-    /// </summary>
-    public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
-    {
-        if (context.Node is ClassDeclarationSyntax
-                { AttributeLists: { Count: > 0 } } classDeclarationSyntax)
-        {
-            var viewModelClassSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
-            var viewModelAttributeData = viewModelClassSymbol?.GetAttributes().SingleOrDefault(x => x.AttributeClass?.ToDisplayString() == "MvvmGen.ViewModelAttribute");
-
-            if (viewModelClassSymbol is not null && viewModelAttributeData is not null)
-            {
-                var (commandsToGenerate,
-                    commandsToInvalidateByPropertyName,
-                    propertiesToGenerate,
-                    propertyInvalidationsByGeneratedPropertyName) = ViewModelMemberInspector.Inspect(viewModelClassSymbol);
-
-                var (generateConstructor, validation) = ViewModelAttributeInspector.Inspect(viewModelAttributeData);
-
-                var viewModelToGenerate = new ViewModelToGenerate(viewModelClassSymbol)
-                {
-                    InjectionsToGenerate = ViewModelInjectAttributeInspector.Inspect(viewModelClassSymbol),
-                    GenerateConstructor = generateConstructor,
-                    Validation = validation,
-                    ViewModelFactoryToGenerate = ViewModelGenerateFactoryAttributeInspector.Inspect(viewModelClassSymbol),
-                    CommandsToGenerate = commandsToGenerate,
-                    PropertiesToGenerate = propertiesToGenerate,
-                    CommandsToInvalidateByPropertyName = commandsToInvalidateByPropertyName
-                };
-
-                viewModelToGenerate.WrappedModelType = ModelMemberInspector.Inspect(viewModelAttributeData, viewModelToGenerate.PropertiesToGenerate);
-
-                SetPropertiesToInvalidatePropertyOnPropertiesToGenerate(viewModelToGenerate.PropertiesToGenerate, propertyInvalidationsByGeneratedPropertyName);
-
-                viewModelToGenerate.IsEventSubscriber = viewModelClassSymbol.Interfaces.Any(x => x.ToDisplayString().StartsWith("MvvmGen.Events.IEventSubscriber"));
-
-                ViewModelsToGenerate.Add(viewModelToGenerate);
-            }
-        }
-    }
-
-    private void SetPropertiesToInvalidatePropertyOnPropertiesToGenerate(IList<PropertyToGenerate> propertiesToGenerate,
-        Dictionary<string, List<string>> propertyInvalidationsByGeneratedPropertyName)
-    {
-        foreach (var propertiesToInvalidate in propertyInvalidationsByGeneratedPropertyName)
-        {
-            var propertyToGenerate = propertiesToGenerate.SingleOrDefault(x => x.PropertyName == propertiesToInvalidate.Key);
-            if (propertyToGenerate is not null)
-            {
-                propertyToGenerate.PropertiesToInvalidate = propertiesToInvalidate.Value;
-            }
-        }
+        context.RegisterForSyntaxNotifications(() => new ViewModelSyntaxReceiver());
     }
 }
