@@ -104,7 +104,9 @@ public class ViewModelGenerator : ISourceGenerator
     private static string ServiceRegistionsMethodBody(IEnumerable<ViewModelToGenerate> vms, List<ServiceClass> services)
     {
         var builder = new StringBuilder();
-        var injections = vms.SelectMany(x => x.InjectionsToGenerate.Select(i => i.Type)).ToArray();
+        var injections = vms.SelectMany(x => x.InjectionsToGenerate.Select(i => i.Type))
+            .Distinct()
+            .ToArray();
         foreach (var injection in injections.AsSpan())
         {
             var c = services.Count(s => s.Interfaces.Any(i => i.ToString() == injection));
