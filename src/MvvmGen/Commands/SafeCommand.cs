@@ -22,6 +22,7 @@ public sealed class SafeCommand : IRelayCommand
     /// The <see cref="Action"/> to invoke when <see cref="Execute"/> is used.
     /// </summary>
     private readonly Action execute;
+    private readonly string _name;
 
     /// <summary>
     /// The optional action to invoke when <see cref="CanExecute"/> is used.
@@ -38,11 +39,12 @@ public sealed class SafeCommand : IRelayCommand
     /// <param name="logger"></param>
     /// <param name="exceptionHandler"></param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> is <see langword="null"/>.</exception>
-    public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler,Action execute)
+    public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler,Action execute, string name = "")
     {
         ArgumentNullException.ThrowIfNull(execute);
 
         this.execute = execute;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -55,13 +57,14 @@ public sealed class SafeCommand : IRelayCommand
     /// <param name="logger"></param>
     /// <param name="exceptionHandler"></param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> or <paramref name="canExecute"/> are <see langword="null"/>.</exception>
-    public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Action execute, Func<bool> canExecute)
+    public SafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Action execute, Func<bool> canExecute, string name = "")
     {
         ArgumentNullException.ThrowIfNull(execute);
         ArgumentNullException.ThrowIfNull(canExecute);
 
         this.execute = execute;
         this.canExecute = canExecute;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -84,12 +87,19 @@ public sealed class SafeCommand : IRelayCommand
     {
         try
         {
+            if (!string.IsNullOrEmpty(_name))
+                _logger.LogInformation($"Starting executing {_name}");
             this.execute();
         }
         catch (Exception e)
         {
             _logger.LogError(e, "");
             _exceptionHandler.Handle(e);
+        }
+        finally
+        {
+            if (!string.IsNullOrEmpty(_name))
+                _logger.LogInformation($"Completed executing {_name}");
         }
     }
 }

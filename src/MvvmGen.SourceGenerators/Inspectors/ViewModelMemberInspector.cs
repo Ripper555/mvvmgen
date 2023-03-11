@@ -206,7 +206,7 @@ internal static class ViewModelMemberInspector
             {
                 HasParameter = methodSymbol.Parameters.Any(),
                 IsAwaitable = methodSymbol.ReturnType.Name == "Task",
-                ParameterType = methodSymbol.Parameters.FirstOrDefault()?.ToString() ?? ""
+                ParameterType = methodSymbol.Parameters.FirstOrDefault()?.Type?.ToString() ?? ""
             };
 
             var commandPropertyName = $"{methodSymbol.Name}Command";

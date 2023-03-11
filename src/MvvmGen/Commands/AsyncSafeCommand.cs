@@ -19,6 +19,7 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
 {
     private ILogger _logger;
     private IExceptionHandler _exceptionHandler;
+    private string _name;
 
     /// <summary>
     /// The cached <see cref="PropertyChangedEventArgs"/> for <see cref="ExecutionTask"/>.
@@ -78,11 +79,12 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// </summary>
     /// <param name="execute">The execution logic.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> is <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute, string name = "")
     {
         ArgumentNullException.ThrowIfNull(execute);
 
         this.execute = execute;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -93,12 +95,13 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// <param name="execute">The execution logic.</param>
     /// <param name="allowConcurrentExecutions">Whether or not to allow concurrent executions of the command.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> is <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute, bool allowConcurrentExecutions)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute, bool allowConcurrentExecutions, string name = "")
     {
         ArgumentNullException.ThrowIfNull(execute);
 
         this.execute = execute;
         this.allowConcurrentExecutions = allowConcurrentExecutions;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -108,11 +111,12 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// </summary>
     /// <param name="cancelableExecute">The cancelable execution logic.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="cancelableExecute"/> is <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute, string name = "")
     {
         ArgumentNullException.ThrowIfNull(cancelableExecute);
 
         this.cancelableExecute = cancelableExecute;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -123,12 +127,13 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// <param name="cancelableExecute">The cancelable execution logic.</param>
     /// <param name="allowConcurrentExecutions">Whether or not to allow concurrent executions of the command.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="cancelableExecute"/> is <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute, bool allowConcurrentExecutions)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute, bool allowConcurrentExecutions, string name = "")
     {
         ArgumentNullException.ThrowIfNull(cancelableExecute);
 
         this.cancelableExecute = cancelableExecute;
         this.allowConcurrentExecutions = allowConcurrentExecutions;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -139,13 +144,14 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// <param name="execute">The execution logic.</param>
     /// <param name="canExecute">The execution status logic.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> or <paramref name="canExecute"/> are <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute, Func<bool> canExecute)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute, Func<bool> canExecute, string name = "")
     {
         ArgumentNullException.ThrowIfNull(execute);
         ArgumentNullException.ThrowIfNull(canExecute);
 
         this.execute = execute;
         this.canExecute = canExecute;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -157,7 +163,7 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// <param name="canExecute">The execution status logic.</param>
     /// <param name="allowConcurrentExecutions">Whether or not to allow concurrent executions of the command.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="execute"/> or <paramref name="canExecute"/> are <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute, Func<bool> canExecute, bool allowConcurrentExecutions)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<Task> execute, Func<bool> canExecute, bool allowConcurrentExecutions, string name = "")
     {
         ArgumentNullException.ThrowIfNull(execute);
         ArgumentNullException.ThrowIfNull(canExecute);
@@ -165,6 +171,7 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
         this.execute = execute;
         this.canExecute = canExecute;
         this.allowConcurrentExecutions = allowConcurrentExecutions;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -175,13 +182,14 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// <param name="cancelableExecute">The cancelable execution logic.</param>
     /// <param name="canExecute">The execution status logic.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="cancelableExecute"/> or <paramref name="canExecute"/> are <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute, Func<bool> canExecute)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute, Func<bool> canExecute, string name = "")
     {
         ArgumentNullException.ThrowIfNull(cancelableExecute);
         ArgumentNullException.ThrowIfNull(canExecute);
 
         this.cancelableExecute = cancelableExecute;
         this.canExecute = canExecute;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -193,7 +201,7 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
     /// <param name="canExecute">The execution status logic.</param>
     /// <param name="allowConcurrentExecutions">Whether or not to allow concurrent executions of the command.</param>
     /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="cancelableExecute"/> or <paramref name="canExecute"/> are <see langword="null"/>.</exception>
-    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute, Func<bool> canExecute, bool allowConcurrentExecutions)
+    public AsyncSafeCommand(ILogger logger, IExceptionHandler exceptionHandler, Func<CancellationToken, Task> cancelableExecute, Func<bool> canExecute, bool allowConcurrentExecutions, string name = "")
     {
         ArgumentNullException.ThrowIfNull(cancelableExecute);
         ArgumentNullException.ThrowIfNull(canExecute);
@@ -201,6 +209,7 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
         this.cancelableExecute = cancelableExecute;
         this.canExecute = canExecute;
         this.allowConcurrentExecutions = allowConcurrentExecutions;
+        _name = name;
         _logger = logger;
         _exceptionHandler = exceptionHandler;
     }
@@ -300,7 +309,8 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
         try
         {
             Task executionTask;
-
+            if (!string.IsNullOrEmpty(_name))
+                _logger.LogInformation($"Starting executing {_name}");
             if (this.execute is not null)
             {
                 // Non cancelable command delegate
@@ -329,6 +339,11 @@ public sealed class AsyncSafeCommand : IAsyncRelayCommand, ICancellationAwareCom
         {
             _logger.LogError(e, "");
             _exceptionHandler.Handle(e);
+        }
+        finally
+        {
+            if (!string.IsNullOrEmpty(_name))
+                _logger.LogInformation($"Completed executing {_name}");
         }
     }
 

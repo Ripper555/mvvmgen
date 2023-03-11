@@ -23,9 +23,9 @@
 		<PackageId>ClayMvvmGen</PackageId>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
 		<Description>MvvmGen is a lightweight, modern MVVM library for XAML applications. It is built with a strong focus on C# source generators to help you to efficiently apply the Model-View-ViewModel pattern in your WPF, WinUI, Uno, Xamarin.Forms and .NET MAUI apps. MvvmGen is your friend who writes all the boilerplate for you.</Description>
-		<Version>0.2.2</Version>
-		<AssemblyVersion>0.2.2.0</AssemblyVersion>
-		<AssemblyFileVersion>0.2.2.0</AssemblyFileVersion>
+		<Version>0.2.3</Version>
+		<AssemblyVersion>0.2.3.0</AssemblyVersion>
+		<AssemblyFileVersion>0.2.3.0</AssemblyFileVersion>
 		<Authors>Thomas Claudius Huber</Authors>
 		<AssemblyCompany>Thomas Claudius Huber</AssemblyCompany>
 		<Copyright>Copyright © Thomas Claudius Huber 2021</Copyright>

@@ -52,6 +52,7 @@ internal static class CommandInitializeMethodGenerator
                     {
                         vmBuilder.Append($", {GetMethodCall(commandToGenerate.CanExecuteMethod.Value, commandToGenerate.ExecuteMethod.HasParameter)}");
                     }
+                    vmBuilder.Append($@", ""{commandToGenerate.PropertyName}""");
                     vmBuilder.AppendLine(");");
                 }
             }
